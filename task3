@@ -1,0 +1,103 @@
+    }
+
+    // withdraws money
+    void withdrawMoney(Scanner sc) {
+        // first check the enterd amount is valid or not
+        double amount = 0;
+        boolean validAmount = false;
+        System.out.print("Enter amount to be withdrawn : ");
+        while(!validAmount) {
+            try {
+                amount = sc.nextDouble();
+                validAmount = isValid(amount, "withdraw");
+            } catch(InputMismatchException e) {
+                sc.nextLine();
+                System.out.print("Invalid amount! Enter amount in numberic value : ");
+                continue;
+            }
+        }
+        // now deduct the money
+        if(amount > this.balance) {
+            System.out.println("<<< INSUFFICIENT BALANCE. CAN'T WITHDRAW. >>>");
+        } else {
+            this.balance = this.balance - amount;
+            System.out.println("<<< " + amount + " Rs. SUCCESSFULLY WITHDRAWN. >>>");
+            transactionHistory(list, amount + " Rs. successfully withdrawn.");
+        }
+        System.out.println();
+    }
+
+    // prints the history of transactions
+    void displayTranHistory() {
+        if(list.size() == 0) {
+                System.out.println("<< NO TRANSACTION HISTORY YET!! >>");
+        } else {
+            System.out.println("<< TRANSACTION HISTORY >>");
+            int i = 1;
+            for (String m : list) {
+                System.out.println(i+". " + m);
+                i++;
+            }
+        }
+        System.out.println();
+    }
+
+    // verify the current pin and then changes it with the new one
+    void verifyAndChange(Scanner sc) {
+        int pin = 0, chancesLeft = 3;
+        System.out.print("Enter you current ATM pin to change it : ");
+        while(chancesLeft > 0) {
+            try {
+                pin = sc.nextInt();
+                if(this.atmPin == pin) {
+                    System.out.println("CURRENT PIN VERIFIED SUCCESSFULLY");
+                    change(sc, list);
+                    break;
+                } else {
+                    chancesLeft--;
+                    if (chancesLeft > 0) {
+                        System.out.print("Incorrect Pin. Enter valid ATM pin (" + chancesLeft + " chance(s) left) : ");
+                    }
+                }
+            } catch(InputMismatchException e) {
+                sc.nextLine();
+                chancesLeft--;
+                if (chancesLeft > 0) {
+                    System.out.print("Incorrect pin. Enter correct numeric pin (" + chancesLeft + " chance(s) left) : ");
+                }
+            }
+        }
+        if(chancesLeft == 0) {
+            System.out.println("<< SORRY YOUR PIN CAN'T BE CHANGED AS YOU ENTERED YOUR CURRENT PIN WRONG 3 TIMES >>");
+            System.out.println("COME BACK LATER.");
+            System.out.println();
+        }
+    }
+
+    private void change(Scanner sc, ArrayList<String> list) {
+        System.out.print("Now enter the new 4 digit ATM pin : ");
+        while(true) {
+            try {
+                int pin = sc.nextInt();
+                if(pin < 1000 && pin > 9999) {
+                    System.out.print("Enter the pin in valid range please : ");
+                    pin = sc.nextInt();
+                } else {
+                    this.atmPin = pin;
+                    System.out.println("<<< YOUR ATM PIN HAS BEEN SUCCESSFULLY CHANGED. >>>");
+                    transactionHistory(list, "ATM Pin changed.");
+                    break;
+                }
+            } catch(InputMismatchException e) {
+                sc.nextLine();
+                System.out.print("Enter pin in numbers and are of 4 digits : ");
+            }    
+        }
+        System.out.println();
+    }
+
+    // this method takes the transaction history message and a list and stores that message in that list 
+    void transactionHistory(ArrayList<String> list, String message) {
+        list.add(message);
+    }
+}
